@@ -1,0 +1,118 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Information about the registered user, including streak, engagement levels, badges, and weekly goals.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier for the user" },
+        "email": { "type": "string", "format": "email", "description": "User email address" },
+        "displayName": { "type": "string", "description": "Display name of the user" },
+        "photoURL": { "type": "string", "description": "Profile picture URL" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Account registration timestamp" },
+        "streakCount": { "type": "integer", "description": "Number of consecutive active days" },
+        "totalCo2SavedKg": { "type": "number", "description": "Total carbon dioxide footprint reduction accumulated" },
+        "lastActiveDate": { "type": "string", "description": "The last recorded active date in YYYY-MM-DD" },
+        "xp": { "type": "integer", "description": "Accumulated gamification experience points" },
+        "levelName": { "type": "string", "description": "Engagement level title based on XP thresholds" },
+        "badges": { "type": "array", "items": { "type": "string" }, "description": "Array of earned badges catalog keys" },
+        "weeklyGoalCo2": { "type": "number", "description": "Carbon footprint reduction goal for the active week" },
+        "weeklyProgressCo2": { "type": "number", "description": "Current weekly carbon footprint reduction progress" },
+        "completedChallengeIds": { "type": "array", "items": { "type": "string" }, "description": "Array of completed challenge identifiers" }
+      },
+      "required": ["uid", "createdAt", "streakCount", "totalCo2SavedKg", "xp", "levelName", "badges", "weeklyGoalCo2", "weeklyProgressCo2", "completedChallengeIds"]
+    },
+    "LifestyleData": {
+      "title": "LifestyleData",
+      "description": "User's current habits across transport, diet, home energy, and shopping",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique identifier of the owner" },
+        "commuteMode": { "type": "string", "enum": ["car", "public_transport", "bike_walk", "electric_car", "hybrid_car"] },
+        "distancePerDayKm": { "type": "number", "description": "Average daily commuting distance" },
+        "annualFlights": { "type": "integer", "description": "Annual frequency of flight transits" },
+        "dietType": { "type": "string", "enum": ["heavy_meat", "occasional_meat", "vegetarian", "vegan"] },
+        "localFoodPercent": { "type": "number", "description": "Percentage representing organic / locally sourced food purchase" },
+        "foodWasteLevel": { "type": "string", "enum": ["high", "medium", "low"] },
+        "electricityKwhPerMonth": { "type": "number", "description": "Monthly electricity bills in standard units (kWh)" },
+        "greenEnergyPercent": { "type": "number", "description": "Percentage of home supply backed by clean/solar grids" },
+        "heatingType": { "type": "string", "enum": ["gas", "electric", "coal_oil", "district_solar", "none"] },
+        "thermostatOffsetC": { "type": "number", "description": "Offset offset of thermostat in Celsius" },
+        "shoppingHabits": { "type": "string", "enum": ["high_consumer", "moderate", "minimalist"] },
+        "recyclingLevel": { "type": "string", "enum": ["none", "some", "full"] },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "commuteMode", "distancePerDayKm", "annualFlights", "dietType", "foodWasteLevel", "electricityKwhPerMonth", "greenEnergyPercent", "heatingType", "shoppingHabits", "recyclingLevel", "updatedAt"]
+    },
+    "Recommendation": {
+      "title": "Recommendation",
+      "description": "AI-Coach generated single high-impact recommendation comparing current activities to potential alternatives",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string", "enum": ["Transport", "Diet", "Energy", "Consumption"] },
+        "co2SavedKgPerYear": { "type": "number" },
+        "difficulty": { "type": "string", "enum": ["easy", "medium", "hard"] },
+        "personalizedReasoning": { "type": "string" },
+        "actionItems": { "type": "array" },
+        "status": { "type": "string", "enum": ["active", "completed", "dismissed"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "title", "description", "category", "co2SavedKgPerYear", "difficulty", "personalizedReasoning", "actionItems", "status", "createdAt", "updatedAt"]
+    },
+    "ImpactLog": {
+      "title": "ImpactLog",
+      "description": "Historic ledger recording completed environmental actions and savings",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "recommendationId": { "type": "string" },
+        "recommendationTitle": { "type": "string" },
+        "category": { "type": "string", "enum": ["Transport", "Diet", "Energy", "Consumption"] },
+        "co2SavedKg": { "type": "number" },
+        "loggedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "recommendationId", "recommendationTitle", "category", "co2SavedKg", "loggedAt"]
+    },
+    "CoachChatMessage": {
+      "title": "CoachChatMessage",
+      "description": "Persistent record for a message in the Sustainability Coach discussion history.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "uid": { "type": "string" },
+        "sender": { "type": "string", "enum": ["user", "coach"] },
+        "text": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "uid", "sender", "text", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Stores basic user profile information and accumulative stats"
+    },
+    "/users/{userId}/lifestyle/current": {
+      "schema": "LifestyleData",
+      "description": "Stores user lifestyle habits"
+    },
+    "/users/{userId}/recommendations/{recId}": {
+      "schema": "Recommendation",
+      "description": "Stores user's actionable recommendations with personalized reasoning text"
+    },
+    "/users/{userId}/impact_logs/{logId}": {
+      "schema": "ImpactLog",
+      "description": "Stores individual logged accomplishments"
+    },
+    "/users/{userId}/coach_chats/{msgId}": {
+      "schema": "CoachChatMessage",
+      "description": "Stores historical Sustainability Coach message history"
+    }
+  }
+}

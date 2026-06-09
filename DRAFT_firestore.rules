@@ -1,0 +1,162 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global default deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Rest of rules matches exactly with the production rules
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // User Profile Validation Helper
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'createdAt', 'streakCount', 'totalCo2SavedKg'])
+        && data.keys().size() <= 8
+        && data.uid == request.auth.uid
+        && data.createdAt == request.time
+        && data.streakCount is int 
+        && data.streakCount >= 0
+        && data.totalCo2SavedKg is number
+        && data.totalCo2SavedKg >= 0
+        && (data.email == null || (data.email is string && data.email.size() <= 200))
+        && (data.displayName == null || (data.displayName is string && data.displayName.size() <= 150))
+        && (data.photoURL == null || (data.photoURL is string && data.photoURL.size() <= 500))
+        && (data.lastActiveDate == null || (data.lastActiveDate is string && data.lastActiveDate.size() <= 20));
+    }
+
+    // Lifestyle Data Validation Helper
+    function isValidLifestyleData(data) {
+      return data.keys().hasAll([
+          'uid', 'commuteMode', 'distancePerDayKm', 'annualFlights', 'dietType',
+          'localFoodPercent', 'foodWasteLevel', 'electricityKwhPerMonth',
+          'greenEnergyPercent', 'heatingType', 'shoppingHabits', 'recyclingLevel', 'updatedAt'
+        ])
+        && data.keys().size() <= 14
+        && data.uid == request.auth.uid
+        && data.updatedAt == request.time
+        && data.commuteMode in ['car', 'public_transport', 'bike_walk', 'electric_car', 'hybrid_car']
+        && data.distancePerDayKm is number && data.distancePerDayKm >= 0 && data.distancePerDayKm <= 500
+        && data.annualFlights is int && data.annualFlights >= 0 && data.annualFlights <= 1000
+        && data.dietType in ['heavy_meat', 'occasional_meat', 'vegetarian', 'vegan']
+        && data.localFoodPercent is number && data.localFoodPercent >= 0 && data.localFoodPercent <= 100
+        && data.foodWasteLevel in ['high', 'medium', 'low']
+        && data.electricityKwhPerMonth is number && data.electricityKwhPerMonth >= 0 && data.electricityKwhPerMonth <= 50000
+        && data.greenEnergyPercent is number && data.greenEnergyPercent >= 0 && data.greenEnergyPercent <= 100
+        && data.heatingType in ['gas', 'electric', 'coal_oil', 'district_solar', 'none']
+        && (data.thermostatOffsetC == null || (data.thermostatOffsetC is number && data.thermostatOffsetC >= -10 && data.thermostatOffsetC <= 10))
+        && data.shoppingHabits in ['high_consumer', 'moderate', 'minimalist']
+        && data.recyclingLevel in ['none', 'some', 'full'];
+    }
+
+    // Recommendation Validation Helper
+    function isValidRecommendation(data) {
+      return data.keys().hasAll([
+          'id', 'uid', 'title', 'description', 'category', 'co2SavedKgPerYear',
+          'difficulty', 'personalizedReasoning', 'actionItems', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().size() <= 13
+        && data.uid == request.auth.uid
+        && data.id is string && data.id.size() <= 128
+        && data.title is string && data.title.size() <= 200
+        && data.description is string && data.description.size() <= 1000
+        && data.category in ['Transport', 'Diet', 'Energy', 'Consumption']
+        && data.co2SavedKgPerYear is number && data.co2SavedKgPerYear >= 0
+        && data.difficulty in ['easy', 'medium', 'hard']
+        && data.personalizedReasoning is string && data.personalizedReasoning.size() <= 3000
+        && data.actionItems is list && data.actionItems.size() <= 20
+        && data.status in ['active', 'completed', 'dismissed']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // Impact Log Validation Helper
+    function isValidImpactLog(data) {
+      return data.keys().hasAll(['id', 'uid', 'recommendationId', 'recommendationTitle', 'category', 'co2SavedKg', 'loggedAt'])
+        && data.keys().size() <= 7
+        && data.uid == request.auth.uid
+        && data.id is string && data.id.size() <= 128
+        && data.recommendationId is string && data.recommendationId.size() <= 128
+        && data.recommendationTitle is string && data.recommendationTitle.size() <= 200
+        && data.category in ['Transport', 'Diet', 'Energy', 'Consumption']
+        && data.co2SavedKg is number && data.co2SavedKg >= 0
+        && data.loggedAt == request.time;
+    }
+
+    // Users Collection rules
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(request.resource.data);
+      
+      allow update: if isOwner(userId) && isValidId(userId) 
+        && isValidUserProfile(request.resource.data)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && (
+          request.resource.data.diff(resource.data).affectedKeys().hasAny(['streakCount', 'totalCo2SavedKg', 'lastActiveDate', 'displayName', 'photoURL'])
+        );
+        
+      allow delete: if false;
+
+      // Subcollection: Lifestyle habits
+      match /lifestyle/{lifestyleId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(lifestyleId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(lifestyleId) && isValidLifestyleData(request.resource.data);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(lifestyleId)
+          && isValidLifestyleData(request.resource.data)
+          && request.resource.data.uid == resource.data.uid
+          && (
+            request.resource.data.diff(resource.data).affectedKeys().hasAny([
+              'commuteMode', 'distancePerDayKm', 'annualFlights', 'dietType',
+              'localFoodPercent', 'foodWasteLevel', 'electricityKwhPerMonth',
+              'greenEnergyPercent', 'heatingType', 'thermostatOffsetC',
+              'shoppingHabits', 'recyclingLevel', 'updatedAt'
+            ])
+          );
+        allow delete: if false;
+      }
+
+      // Subcollection: Recommendations
+      match /recommendations/{recId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(recId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(recId) 
+          && isValidRecommendation(request.resource.data)
+          && request.resource.data.createdAt == request.time;
+          
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(recId)
+          && isValidRecommendation(request.resource.data)
+          && request.resource.data.uid == resource.data.uid
+          && request.resource.data.createdAt == resource.data.createdAt
+          && (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+          );
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(recId);
+      }
+
+      // Subcollection: Cumulative log entries
+      match /impact_logs/{logId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(logId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(logId)
+          && isValidImpactLog(request.resource.data)
+          && existsAfter(/databases/$(database)/documents/users/$(userId));
+          
+        allow update: if false;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(logId);
+      }
+    }
+  }
+}

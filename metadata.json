@@ -1,0 +1,6 @@
+{
+  "name": "EcoMind AI",
+  "description": "An AI Sustainability Coach powered by a high-impact comparative decision engine and personalized carbon footprint tradeoffs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
