@@ -6,6 +6,19 @@ Rather than presenting generic eco-tips or raw carbon values, EcoMind AI utilize
 
 ---
 
+## 📋 Problem Statement
+
+Traditional carbon calculators suffer from low engagement due to abstract metrics (e.g., tons of CO₂), lack of personalization, and static, unscientific recommendation formulas. Users are overwhelmed by generic ecological tips that fail to address their specific lifestyle levers. There is a critical disconnect between identifying a carbon footprint and executing a targeted, verified plan to reduce it.
+
+## 💡 Approach
+
+EcoMind AI provides an action-oriented solution by translating raw consumer metrics into personalized high-leverage steps. 
+*   **Structured Core Pipeline**: We decouple quantitative emissions calculations and decision reasoning from the language model to prevent AI hallucinations. Calculations are managed by deterministic mathematical models.
+*   **Explainability Engines**: Interactive explanations map out *why* a dynamic action step is prioritized and why other alternatives are rejected.
+*   **Gamified Behavior Loops**: To encourage long-term adoption, we integrate standard engagement models: XP levels, badge triggers, dynamic daily/weekly quests, and real-time ledger histories.
+
+---
+
 ## 🎯 Main Reasoning Architecture
 
 EcoMind AI implements a strict, context-aware operational pipeline:
@@ -104,6 +117,39 @@ npm run test
 ```
 
 These verify that all features work seamlessly under edge cases, malformed payloads, or dirty inputs without any runtime state failures.
+
+---
+
+## ♿ Accessibility
+
+EcoMind AI is engineered to adhere to strict WCAG 2.1 AA parameters:
+*   **Semantic Structures**: Configured with proper semantic elements (`<main>`, `<header>`, `<footer>`, `<section>`) and distinct document-flow hierarchies.
+*   **Label Integrity**: Interactive elements (buttons, inputs, and tab switches) use exact, highly-descriptive labels or explicit `aria-label` tags (e.g. `aria-label="List actionable recommendations"`).
+*   **Tap Targets**: Touchpoints maintain a minimum 44px active dimension on mobile layouts, providing comfortable tapping bounds.
+*   **Contrast Pairing**: Designed with accessible color rules — avoiding thin primary fonts and enforcing clean slate-800 or slate-900 typography over soft, clean off-white backgrounds.
+
+---
+
+## 🚀 Deployment
+
+The system compiles into a robust full-stack production container matching the platform's requirements:
+*   **Static Asset Bundles**: Client-side TypeScript assets are compiled via Vite into `/dist/`.
+*   **Server Component Packaging**: The server script (`server.ts`) is bundled cleanly into a single self-contained CJS bundle `/dist/server.cjs` using `esbuild`.
+*   **Egress Readiness**: The production container binds to host `0.0.0.0` on port `3000` for seamless routing inside Cloud Run.
+*   **Start Command**: Deployed environments initiate execution via the compiled handler:
+    ```bash
+    node dist/server.cjs
+    ```
+
+---
+
+## 📌 Assumptions & Scope Bounds
+
+To deliver deterministic carbon modeling, the following engineering assumptions are configured:
+1.  **Metric Co₂ Constants**: Baseline coefficients are compiled from standard EPA greenhouse gas equivalent profiles (e.g. car transportation at `0.18 kg` CO₂ per km).
+2.  **Annual Projections**: All daily calculations (e.g., commute mileage) are projected linearly assuming standard yearly active durations.
+3.  **Local Storage Parity**: Guest profiles utilize the exact same schema structure mapped to local browser state (`localStorage`) to guarantee instant fallback and no-auth parity.
+4.  **Static Fuel Averages**: Standard utility averages are referenced where actual localized grid-mix ratios are unavailable.
 
 ---
 

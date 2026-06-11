@@ -9,7 +9,7 @@
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx src/tests/carbonEngine.test.ts && tsx src/tests/engagement.test.ts && tsx src/tests/integration.test.ts"
+    "test": "vitest run && npx tsx src/tests/carbonEngine.test.ts && npx tsx src/tests/engagement.test.ts && npx tsx src/tests/integration.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
@@ -26,13 +26,16 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",
-    "vite": "^6.2.3"
+    "vite": "^6.2.3",
+    "vitest": "^4.1.8"
   }
 }

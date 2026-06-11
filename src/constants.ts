@@ -97,3 +97,85 @@ export function calculateLifestyleEmissions(data: {
     total: Math.round(transportAnnual + flightsAnnual + dietAnnual + foodWasteAnnual + electricityAnnual + heatingAnnual + consumptionAnnual)
   };
 }
+
+export interface ChallengeCatalogItem {
+  id: string;
+  title: string;
+  description: string;
+  xpReward: number;
+  co2SavedKg: number;
+  category: 'Transport' | 'Diet' | 'Energy' | 'Consumption';
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  duration: 'Daily' | 'Weekly';
+  progress: number;
+  target: number;
+  completed: boolean;
+}
+
+export const CHALLENGES_CATALOG: ChallengeCatalogItem[] = [
+  {
+    id: 'ch_1',
+    title: 'Pedal Over Petrol',
+    description: 'Commute using active transport (bicycle, walking) instead of a gasoline car.',
+    xpReward: 40,
+    co2SavedKg: 5,
+    category: 'Transport',
+    difficulty: 'Easy',
+    duration: 'Daily',
+    progress: 0,
+    target: 1,
+    completed: false
+  },
+  {
+    id: 'ch_2',
+    title: 'The Meatless Maverick',
+    description: 'Prepare and log full-day meals using vegetarian or plant-based ingredients.',
+    xpReward: 50,
+    co2SavedKg: 8,
+    category: 'Diet',
+    difficulty: 'Medium',
+    duration: 'Daily',
+    progress: 0,
+    target: 1,
+    completed: false
+  },
+  {
+    id: 'ch_3',
+    title: 'Degree Detective',
+    description: 'Shift your thermostat by 1°C in your home today.',
+    xpReward: 30,
+    co2SavedKg: 3,
+    category: 'Energy',
+    difficulty: 'Easy',
+    duration: 'Daily',
+    progress: 0,
+    target: 1,
+    completed: false
+  },
+  {
+    id: 'ch_4',
+    title: 'Planted Forest Hero',
+    description: 'Log 5 sustainable habits with your AI coach to level up your ecological score.',
+    xpReward: 100,
+    co2SavedKg: 20,
+    category: 'Consumption',
+    difficulty: 'Hard',
+    duration: 'Weekly',
+    progress: 2,
+    target: 5,
+    completed: false
+  },
+  {
+    id: 'ch_5',
+    title: 'Zero Scrap Chef',
+    description: 'Optimize meals to avoid throwaways or compost organic waste for a full week.',
+    xpReward: 80,
+    co2SavedKg: 10,
+    category: 'Diet',
+    difficulty: 'Medium',
+    duration: 'Weekly',
+    progress: 4,
+    target: 7,
+    completed: false
+  }
+];

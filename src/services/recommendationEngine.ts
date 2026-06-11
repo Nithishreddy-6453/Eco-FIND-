@@ -1,5 +1,6 @@
 import { UnifiedContext, Recommendation } from '../types';
 import { EMISSION_FACTORS } from '../constants';
+import { getWhySelected, getWhyRejected } from './recommendationReasons';
 
 export const RecommendationEngine = {
   /**
@@ -251,45 +252,16 @@ export const RecommendationEngine = {
       const estimatedImpact = `Saves ${rawRec.co2SavedKgPerYear.toLocaleString()} kg CO₂/year (approx. ${monthlySaved} kg/month)`;
 
       // Explain WHY this action is selected (Personalized)
-      let whySelected = '';
-      switch (rawRec.id) {
-        case 'act_transport_commute':
-          whySelected = `Your baseline shows ${carbonScore.breakdown.transport.toLocaleString()} kg CO₂/yr originating from commuting via ${lifestyle.commuteMode.replace('_', ' ')}. Upgrading this is your absolute biggest mobility lever.`;
-          break;
-        case 'act_transport_flights':
-          whySelected = `You logged ${lifestyle.annualFlights} annual flights. Aviation is incredibly carbon-intensive; avoiding mid-to-short flights produces large immediate savings of up to ${carbonScore.breakdown.flights.toLocaleString()} kg CO₂/yr.`;
-          break;
-        case 'act_diet_vegan':
-          whySelected = `Your ${lifestyle.dietType.replace('_', ' ')} food consumption creates ${carbonScore.breakdown.diet.toLocaleString()} kg CO₂/yr. Restructuring protein choices is your largest diet optimization step.`;
-          break;
-        case 'act_food_waste':
-          whySelected = `Your kitchen setup has "${lifestyle.foodWasteLevel}" waste output. Eliminating this limits organic decay in anaerobic land cells.`;
-          break;
-        case 'act_energy_solar':
-          whySelected = `Your utility consumption relies on standard grid sources. Powering your home grid completely cleans up ${carbonScore.breakdown.electricity.toLocaleString()} kg CO₂ of annual supply strain.`;
-          break;
-        case 'act_energy_thermostat':
-          whySelected = `Your heating source (${lifestyle.heatingType}) generates ${carbonScore.breakdown.heating.toLocaleString()} kg CO₂/yr. Insulating saves direct furnace burn.`;
-          break;
-        case 'act_consumption_shopping':
-          whySelected = `Your retail consumption profile shows a "${lifestyle.shoppingHabits}" pattern. Shifting to minimalist purchase loops prevents intense industrial fabrication.`;
-          break;
-        case 'act_waste_recycling':
-          whySelected = `You logged "${lifestyle.recyclingLevel}" recycling levels. Meticulous sorting avoids trash incineration or carbon leaks.`;
-          break;
-        default:
-          whySelected = `Selected to help optimize your ${rawRec.category.toLowerCase()} carbon footprint and balance daily sustainability goals.`;
-      }
+      const whySelected = getWhySelected(rawRec.id, carbonScore, lifestyle);
 
       // Explain WHY it was rejected or why it is lower-ranked
-      let whyRejected = '';
-      if (isTop) {
-        whyRejected = "Not deprioritized. This is selected as your absolute peak carbon leverage action because it yields the highest numeric CO₂ savings.";
-      } else {
-        const topSaved = topAction?.co2SavedKgPerYear || 100;
-        const multiplier = (topSaved / rawRec.co2SavedKgPerYear).toFixed(1);
-        whyRejected = `Deprioritized below your primary goal ("${topAction.title}") because "${topAction.title}" reduces carbon output by ${topSaved} kg CO₂/yr, making it ${multiplier}x more impactful than this action.`;
-      }
+      const whyRejected = getWhyRejected(
+        isTop,
+        topAction?.title || '',
+        topAction?.co2SavedKgPerYear || 100,
+        rawRec.title,
+        rawRec.co2SavedKgPerYear
+      );
 
       const personalizedReasoning = `${whySelected} This action is highly effective: ${estimatedImpact}. Comparing metrics, it reduces emissions significantly more than secondary activities.`;
 
