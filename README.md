@@ -1,20 +1,133 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# EcoMind AI &bull; Premium Carbon Intelligence Companion
 
-# Run and deploy your AI Studio app
+EcoMind AI is a premium, full-stack, AI-powered Sustainability Coach and Carbon Decision Companion. It is designed to act not as a simple carbon calculator, but as an advanced personalized strategy companion inspired by Apple Health's aesthetic quality and modern wellness dashboards.
 
-This contains everything you need to run your app locally.
+Rather than presenting generic eco-tips or raw carbon values, EcoMind AI utilizes a multi-stage decision architecture that highlights exact trade-offs with highly engaging gameplay triggers.
 
-View your app in AI Studio: https://ai.studio/apps/62972cc5-63d4-44fa-b788-eb54d73e96eb
+---
 
-## Run Locally
+## 🎯 Main Reasoning Architecture
 
-**Prerequisites:**  Node.js
+EcoMind AI implements a strict, context-aware operational pipeline:
 
+```
+  [User Profile, Habits & Goals]
+                 │
+                 ▼
+          [Context Engine] ───► Consolidated Unified Context
+                 │
+                 ▼
+         [Decision Engine] ───► Identify Largest Emission Group & Top Action
+                 │
+                 ▼
+     [Recommendation Engine] ─► Generate Ranked Actions with Multi-Reasoning Logs
+                 │
+                 ▼
+   [Gemini Explanation Layer] ─► Contextual Explanation, Education & Coaching
+```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Context Engine**: Aggregates and normalizes multiple disparate data sources into a high-integrity, unified state representation containing user stats, historical logs, emission profiles, and specific goals.
+2. **Decision Engine**: Conducts algorithmic multi-criteria evaluations over the compiled context, identifying the heaviest emission category and isolating the single highest-impact target action.
+3. **Recommendation Engine**: Generates and ranks actionable upgrades, appending rich explainability metrics (`whySelected`, `whyRejected`, and `estimatedImpact`) for every recommendation.
+4. **Gemini Explanation Layer (Restricted)**: Strictly restricted from generating recommendations directly. Instead, it serves purely to explain *why* recommendations matter, provide scientific education, and personalize the coaching journey.
+5. **Durable Ledger Integration**: Completing recommendations awards XP and adds the saving record to an immutable audit ledger history synchronized to Google Cloud Firestore database partitions.
+
+---
+
+## ⚙️ Core Technical Engines
+
+### 1. Context Engine (`src/services/contextEngine.ts`)
+Creates a high-integrity `UnifiedContext` block, combining user profiles, historical logs, milestones, goals, and raw lifestyle factors into a single source of truth:
+*   **Input**: `UserProfile`, `LifestyleData`, `ImpactLog[]`.
+*   **Output**: `UnifiedContext` containing profile state, sanitized lifestyle data, ledger achievements history, and calculated emissions baseline.
+
+### 2. Decision Engine (`src/services/decisionEngine.ts`)
+Applies logic rules over the unified context to pinpoint peak-leverage carbon adjustments:
+*   **Input**: `UnifiedContext` block.
+*   **Output**: `largestEmissionSource`, `contributionPercentage`, `highestImpactAction`, `estimatedReduction`, and a rigorous comparative mathematical `reasoning` log.
+*   **Trade-off Calculation**: Measures the exact performance gap of major structural shifts (e.g. EV commuting) over ambient domestic actions (e.g. standard material recycling) to demonstrate clear mathematical superiority.
+
+### 3. Recommendation Engine (`src/services/recommendationEngine.ts`)
+Compiles actionable, highly tailored structural upgrades ranked strictly in descending order of CO₂ saving potential:
+*   **whySelected**: Clear, profile-driven reasons explaining why this specific action was generated (targeted directly at the user's high-emissions habits).
+*   **whyRejected**: Detailed comparative rationale showing why it was deprioritized compared to the peak primary recommendation (with multiplier savings ratios).
+*   **estimatedImpact**: Verifiable emission reduction outputs represented as solid, human-readable annual and monthly metrics.
+
+### 4. Restricted Gemini Explanation Layer (`server.ts`)
+The machine-learning layer is strictly prohibited from manufacturing arbitrary or hallucinatory recommendations. It functions solely as a coach to:
+*   **Explain**: Break down chemical and physical pathways of chosen actions (e.g., thermal losses, grids combustion).
+*   **Personalize**: Tailor explanations based on user's active progress metrics, badge collections, and historic savings.
+*   **Educate**: Provide authoritative answers to sustainability queries without fabricating mock carbon scores.
+
+---
+
+## 🎮 Gamification & Engagement Mechanics
+
+EcoMind AI translates environmental tracking into a game-like journey, encouraging daily habits:
+*   **XP Progression**: Earn XP with daily missions and custom check-ins.
+*   **Ranks**:
+    *   `Level 1 (0-199 XP)`: Eco Beginner
+    *   `Level 2 (200-399 XP)`: Green Explorer
+    *   `Level 3 (400-599 XP)`: Climate Warrior
+    *   `Level 4 (600-799 XP)`: Eco Hero
+    *   `Level 5+ (800+ XP)`: Planet Guardian (growth scales infinitely)
+*   **Badge Matrix**: Automatic evaluations for:
+    *   `Streak King`: Maintain a 3+ consecutive active streak.
+    *   `Meatless Maverick`: Log plant-based vegetarian dietary goals.
+    *   `Watt Saver`: Register home electricity adjustments.
+    *   `Quests Conqueror`: Clear at least 3 daily or weekly missions.
+*   **Virtual Sprout Game**: Hydrate and nurture a virtual sprout to maturity using earned gamified XP, transferring digital dedication into real biological metrics.
+
+---
+
+## 🔒 Durable Security & Persistence
+
+All database schemas, document properties, and relationship bounds are strictly declared inside the custom transaction-protected Firestore system:
+*   **User Profiles (`/users/{userId}`)**: Durably tracks Streaks, Active Levels, badges earned, and weekly progress.
+*   **Personal Habits (`/users/{userId}/lifestyle/current`)**: Real-time habit logs.
+*   **Bespoke Plans (`/users/{userId}/recommendations/{recId}`)**: Tracks active, completed, or dismissed plans.
+*   **Immutable Historical Ledgers (`/users/{userId}/impact_logs/{logId}`)**: Audit trails logging genuine saving accomplishments.
+*   **Historical Coach Chats (`/users/{userId}/coach_chats/{msgId}`)**: Chats backed by full history context to enable personalized continuing advice.
+
+### Firestore Rules
+Secure client-side configurations enforce authorization constraints checking authentication states (`request.auth`), content sizes, data types, field bounds, schema requirements, and cross-document transactional atomicity.
+
+---
+
+## 🧪 Comprehensive Integration Testing
+
+A reliable, custom integration test framework is built directly into the repository, simulating onboarding flows, emissions processing, XP gains, level transitions, badge evaluations, and boundary clamping.
+
+### Run Tests:
+```bash
+npm run test
+```
+
+These verify that all features work seamlessly under edge cases, malformed payloads, or dirty inputs without any runtime state failures.
+
+---
+
+## 🛠️ Setup & Local Development
+
+### 1. Configure the Environment
+Copy the example environment credentials config:
+```bash
+cp .env.example .env
+```
+Ensure a real, private server-side key `GEMINI_API_KEY` is specified.
+
+### 2. Install Packages
+```bash
+npm install
+```
+
+### 3. Star Dev Servers
+```bash
+npm run dev
+```
+
+### 4. Direct Builds
+```bash
+npm run build
+```
+Production outputs compile cleanly into self-hosted, lightweight `dist` assets with server bundles.

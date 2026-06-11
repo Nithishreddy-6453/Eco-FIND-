@@ -65,6 +65,67 @@ export interface Recommendation {
   status: 'active' | 'completed' | 'dismissed';
   createdAt: string;
   updatedAt: string;
+
+  // New challenge-alignment engine fields
+  whySelected?: string;
+  whyRejected?: string;
+  estimatedImpact?: string;
+}
+
+export interface UnifiedContext {
+  userId: string;
+  profile: {
+    displayName: string;
+    xp: number;
+    levelName: string;
+    streakCount: number;
+    badges: string[];
+    weeklyGoalCo2: number;
+    weeklyProgressCo2: number;
+  };
+  lifestyle: {
+    commuteMode: 'car' | 'public_transport' | 'bike_walk' | 'electric_car' | 'hybrid_car';
+    distancePerDayKm: number;
+    annualFlights: number;
+    dietType: 'heavy_meat' | 'occasional_meat' | 'vegetarian' | 'vegan';
+    localFoodPercent: number;
+    foodWasteLevel: 'high' | 'medium' | 'low';
+    electricityKwhPerMonth: number;
+    greenEnergyPercent: number;
+    heatingType: 'gas' | 'electric' | 'coal_oil' | 'district_solar' | 'none';
+    thermostatOffsetC: number;
+    shoppingHabits: 'high_consumer' | 'moderate' | 'minimalist';
+    recyclingLevel: 'none' | 'some' | 'full';
+  };
+  progress: {
+    totalCo2SavedKg: number;
+    completedCount: number;
+    historyLogs: Array<{
+      recommendationTitle: string;
+      co2SavedKg: number;
+      loggedAt: string;
+    }>;
+  };
+  carbonScore: {
+    breakdown: {
+      transport: number;
+      flights: number;
+      diet: number;
+      foodWaste: number;
+      electricity: number;
+      heating: number;
+      consumption: number;
+      total: number;
+    };
+  };
+}
+
+export interface DecisionEngineOutput {
+  largestEmissionSource: string;
+  contributionPercentage: number;
+  highestImpactAction: string;
+  estimatedReduction: string;
+  reasoning: string;
 }
 
 export interface ImpactLog {

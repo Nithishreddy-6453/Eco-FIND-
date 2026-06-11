@@ -47,7 +47,9 @@ export function DashboardView({
 
   const activeRecommendations = recommendations.filter(r => r.status === 'active');
   const principalRec = activeRecommendations.find(r => r.id === selectedRecId) || activeRecommendations[0];
-  const baselineEmissions = lifestyleData ? calculateLifestyleEmissions(lifestyleData) : null;
+  const baselineEmissions = React.useMemo(() => {
+    return lifestyleData ? calculateLifestyleEmissions(lifestyleData) : null;
+  }, [lifestyleData]);
 
   // Level progression metrics
   const xp = userProfile?.xp ?? 0;
@@ -87,14 +89,16 @@ export function DashboardView({
           <button
             onClick={onRecalibrate}
             title="Recalibrate"
-            className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-xl text-slate-500 hover:text-slate-850 transition-all cursor-pointer"
+            aria-label="Recalibrate carbon footprint baseline values"
+            className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/60 rounded-xl text-slate-500 hover:text-slate-850 transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
           <button
             onClick={onLogout}
             title="Sign Out"
-            className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-500 border border-slate-200/60 rounded-xl text-slate-500 transition-all cursor-pointer"
+            aria-label="Logout user session"
+            className="p-2 bg-slate-50 hover:bg-red-50 hover:text-red-500 border border-slate-200/60 rounded-xl text-slate-500 transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
           >
             <Power className="w-4 h-4" />
           </button>
@@ -105,7 +109,8 @@ export function DashboardView({
       <div className="flex gap-2 bg-white border border-slate-100 p-1.5 rounded-2xl shadow-sm" id="dashboard-segmented-tabs">
         <button
           onClick={() => setActiveTab('recommendations')}
-          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+          aria-label="List actionable recommendations"
+          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${
             activeTab === 'recommendations'
               ? 'bg-slate-900 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
@@ -116,7 +121,8 @@ export function DashboardView({
         </button>
         <button
           onClick={() => setActiveTab('chat')}
-          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 ${
+          aria-label="Consult the AI Decision Coach"
+          className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 ${
             activeTab === 'chat'
               ? 'bg-slate-900 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-800'
@@ -173,27 +179,51 @@ export function DashboardView({
                     </p>
                   </div>
 
-                  {/* Impact & trade offs */}
-                  <div className="mt-5 bg-slate-50 border border-slate-100 rounded-2xl p-4.5 space-y-3" id="coach-decision-engine">
-                    <p className="text-[9px] text-slate-400 font-bold tracking-widest uppercase">Potential Impact</p>
-                    
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="space-y-1 bg-white p-3 rounded-xl border border-slate-100">
-                        <span className="text-[8px] bg-emerald-50 text-emerald-600 font-bold px-1.5 py-0.5 rounded-md uppercase">BEST OPTION</span>
-                        <p className="text-[10px] text-slate-400 font-bold mt-1 line-clamp-1">{principalRec.title}</p>
-                        <p className="text-base font-bold text-emerald-605 font-mono">{(principalRec.comparisonMetric?.primaryCo2Saved || principalRec.co2SavedKgPerYear).toLocaleString()} kg CO₂/yr</p>
+                  {/* Decision Engine Explainability Breakdown */}
+                  <div className="mt-5 bg-slate-50 border border-slate-100 rounded-2xl p-4 sm:p-5 space-y-4" id="coach-decision-engine">
+                    <div>
+                      <p className="text-[9px] text-emerald-700 font-extrabold tracking-widest uppercase">Intelligent Decision Log</p>
+                      <h4 className="text-xs font-bold text-slate-800 mt-0.5">Multi-Stage Reasoning Explainability</h4>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-0.5 bg-white p-3 rounded-xl border border-slate-100 shadow-2xs">
+                        <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Estimated Impact</p>
+                        <p className="text-sm font-extrabold text-slate-800 font-mono">
+                          {principalRec.co2SavedKgPerYear.toLocaleString()} kg CO₂/yr
+                        </p>
+                        <p className="text-[9px] text-emerald-600 font-semibold font-mono">
+                          ≈ {Math.round(principalRec.co2SavedKgPerYear / 12)} kg/mo
+                        </p>
                       </div>
 
-                      <div className="space-y-1 bg-white p-3 rounded-xl border border-slate-100 opacity-60">
-                        <span className="text-[8px] bg-slate-100 text-slate-500 font-bold px-1.5 py-0.5 rounded-md uppercase">Lesser Alternative</span>
-                        <p className="text-[10px] text-slate-400 font-bold mt-1 line-clamp-1">Other generic attempts</p>
-                        <p className="text-base font-bold text-slate-400 font-mono">{(principalRec.comparisonMetric?.secondaryCo2Saved || Math.round(principalRec.co2SavedKgPerYear * 0.25)).toLocaleString()} kg CO₂/yr</p>
+                      <div className="space-y-0.5 bg-white p-3 rounded-xl border border-slate-100 shadow-2xs col-span-2">
+                        <p className="text-[8px] text-slate-400 font-bold uppercase tracking-wider">Comparison Metrics</p>
+                        <p className="text-[10px] text-slate-650 font-semibold leading-relaxed">
+                          Saves <span className="text-emerald-600 font-bold font-mono">{(principalRec.comparisonMetric?.primaryCo2Saved || principalRec.co2SavedKgPerYear).toLocaleString()} kg/yr</span> vs. only <span className="text-slate-500 font-bold font-mono">{(principalRec.comparisonMetric?.secondaryCo2Saved || 80)} kg/yr</span> with secondary alternatives like basic household sorting.
+                        </p>
                       </div>
                     </div>
 
-                    <p className="text-xs text-slate-500 leading-relaxed italic bg-white/70 p-3 rounded-xl border border-slate-100">
-                      "{principalRec.personalizedReasoning}"
-                    </p>
+                    <div className="space-y-2.5 text-xs">
+                      {principalRec.whySelected && (
+                        <div className="bg-white/85 border border-slate-100 rounded-xl p-3 shadow-2xs">
+                          <p className="text-[9px] text-emerald-600 font-bold uppercase tracking-wider mb-0.5">Why This Action Is Recommended</p>
+                          <p className="text-slate-700 leading-relaxed font-semibold">
+                            {principalRec.whySelected}
+                          </p>
+                        </div>
+                      )}
+
+                      {principalRec.whyRejected && (
+                        <div className="bg-white/85 border border-slate-100 rounded-xl p-3 shadow-2xs">
+                          <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Comparative Superiority Analysis</p>
+                          <p className="text-slate-650 leading-relaxed font-semibold">
+                            {principalRec.whyRejected}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Actions list */}
@@ -205,7 +235,7 @@ export function DashboardView({
                           <span className="w-4.5 h-4.5 bg-emerald-50 text-emerald-600 text-xs font-bold rounded-lg flex items-center justify-center font-mono shrink-0">
                             {idx + 1}
                           </span>
-                          <p className="text-slate-655 font-medium leading-normal">{item}</p>
+                          <p className="text-slate-600 font-medium leading-normal format-line-item">{item}</p>
                         </div>
                       ))}
                     </div>
@@ -365,14 +395,14 @@ export function DashboardView({
                 <span className="text-[9px] text-emerald-600 font-bold tracking-widest uppercase block px-1">Today's Missions</span>
                 <div className="space-y-2">
                   {dashChallenges.map((ch, idx) => (
-                    <div key={idx} className="bg-white border border-slate-102 rounded-2xl p-3 flex justify-between items-center shadow-inner">
+                    <div key={idx} className="bg-white border border-slate-100 rounded-2xl p-3 flex justify-between items-center shadow-inner">
                       <div>
                         <p className="text-xs font-bold text-slate-800">{ch.title}</p>
                         <p className="text-[9px] text-slate-400 mt-0.5">{ch.cat}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-[9px] text-emerald-600 font-bold block">{ch.co2}</span>
-                        <span className="text-[8px] bg-slate-50 text-slate-450 px-1 py-0.5 rounded border border-slate-100">{ch.reward}</span>
+                        <span className="text-[8px] bg-slate-50 text-slate-500 px-1 py-0.5 rounded border border-slate-100">{ch.reward}</span>
                       </div>
                     </div>
                   ))}
@@ -382,7 +412,8 @@ export function DashboardView({
               {/* AI Coach Entry Point (Helpful card redirection CTA) */}
               <button
                 onClick={() => setActiveTab('chat')}
-                className="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded-2xl p-4 flex items-center justify-between text-left transition-all cursor-pointer shadow-sm group"
+                aria-label="Direct message sustainability coach conversation"
+                className="w-full bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded-2xl p-4 flex items-center justify-between text-left transition-all cursor-pointer shadow-sm group font-fancy"
               >
                 <div className="space-y-0.5">
                   <p className="text-xs font-bold text-emerald-700 flex items-center gap-1.5">
@@ -391,7 +422,7 @@ export function DashboardView({
                   </p>
                   <p className="text-[10px] text-emerald-600 leading-snug">Get customized advice based on statistics.</p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-emerald-650 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="w-4 h-4 text-emerald-600 group-hover:translate-x-0.5 transition-transform" />
               </button>
 
             </div>

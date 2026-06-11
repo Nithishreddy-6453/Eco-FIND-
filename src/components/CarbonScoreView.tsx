@@ -11,7 +11,9 @@ interface CarbonScoreViewProps {
 
 export function CarbonScoreView({ lifestyleData, onRecalibrate }: CarbonScoreViewProps) {
   const [showFormulaInfo, setShowFormulaInfo] = useState<boolean>(false);
-  const baselineEmissions = lifestyleData ? calculateLifestyleEmissions(lifestyleData) : null;
+  const baselineEmissions = React.useMemo(() => {
+    return lifestyleData ? calculateLifestyleEmissions(lifestyleData) : null;
+  }, [lifestyleData]);
 
   if (!baselineEmissions) {
     return (
@@ -149,32 +151,32 @@ export function CarbonScoreView({ lifestyleData, onRecalibrate }: CarbonScoreVie
               value: baselineEmissions.transport + baselineEmissions.flights, 
               tag: 'EV / Transit / Flight',
               percentage: Math.round(((baselineEmissions.transport + baselineEmissions.flights) / baselineEmissions.total) * 100), 
-              color: 'bg-blue-450', 
-              text: 'text-blue-500' 
+              color: 'bg-blue-500', 
+              text: 'text-blue-600' 
             },
             { 
               label: 'Dietary Habits', 
               value: baselineEmissions.diet + baselineEmissions.foodWaste, 
               tag: 'Proteins / Waste',
               percentage: Math.round(((baselineEmissions.diet + baselineEmissions.foodWaste) / baselineEmissions.total) * 100), 
-              color: 'bg-emerald-450', 
-              text: 'text-emerald-500' 
+              color: 'bg-emerald-500', 
+              text: 'text-emerald-600' 
             },
             { 
               label: 'Electricity & Heating', 
               value: baselineEmissions.electricity + baselineEmissions.heating, 
               tag: 'Thermostat / Grid',
               percentage: Math.round(((baselineEmissions.electricity + baselineEmissions.heating) / baselineEmissions.total) * 100), 
-              color: 'bg-amber-450', 
-              text: 'text-amber-500' 
+              color: 'bg-amber-500', 
+              text: 'text-amber-600' 
             },
             { 
               label: 'Goods Consumption', 
               value: baselineEmissions.consumption, 
               tag: 'Recycling / Shopping',
               percentage: Math.round((baselineEmissions.consumption / baselineEmissions.total) * 100), 
-              color: 'bg-purple-450', 
-              text: 'text-purple-500' 
+              color: 'bg-purple-500', 
+              text: 'text-purple-600' 
             }
           ].map((item, idx) => (
             <div key={idx} className="space-y-1">

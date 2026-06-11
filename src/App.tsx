@@ -5,6 +5,7 @@ import { AuthScreen } from './components/AuthScreen';
 import { OnboardingQuestionnaire } from './components/OnboardingQuestionnaire';
 import { DashboardView } from './components/DashboardView';
 import { loginWithGoogle, logout } from './firebase/config';
+import { Recommendation } from './types';
 
 // View modules
 import { SplashScreen } from './components/SplashScreen';
@@ -81,9 +82,10 @@ export default function App() {
     setAuthError(null);
     try {
       await loginWithGoogle();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Sign in failed:', err);
-      setAuthError(err?.message || 'Google Auth cancelled.');
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setAuthError(errMsg || 'Google Auth cancelled.');
     } finally {
       setAuthLoading(false);
     }
@@ -99,14 +101,14 @@ export default function App() {
       } else {
         await logout();
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Log out failed:', err);
     } finally {
       setAuthLoading(false);
     }
   };
 
-  const handleLogRecommendationAccomplished = async (rec: any, status: 'completed' | 'dismissed') => {
+  const handleLogRecommendationAccomplished = async (rec: Recommendation, status: 'completed' | 'dismissed') => {
     try {
       await updateRecommendationStatus(rec, status);
       if (status === 'completed') {

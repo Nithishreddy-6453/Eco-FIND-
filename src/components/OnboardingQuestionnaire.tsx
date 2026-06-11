@@ -196,6 +196,10 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
                   step="5"
                   value={distancePerDayKm}
                   onChange={(e) => setDistancePerDayKm(Number(e.target.value))}
+                  aria-label="Commute travel distance per day in kilometers"
+                  aria-valuemin={0}
+                  aria-valuemax={120}
+                  aria-valuenow={distancePerDayKm}
                   className="w-full accent-emerald-500 bg-slate-100 h-1 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -213,6 +217,10 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
                   step="1"
                   value={annualFlights}
                   onChange={(e) => setAnnualFlights(Number(e.target.value))}
+                  aria-label="Annual flights taken per year"
+                  aria-valuemin={0}
+                  aria-valuemax={15}
+                  aria-valuenow={annualFlights}
                   className="w-full accent-emerald-500 bg-slate-100 h-1 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -302,6 +310,10 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
                   step="10"
                   value={localFoodPercent}
                   onChange={(e) => setLocalFoodPercent(Number(e.target.value))}
+                  aria-label="Percentage of food bought locally"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={localFoodPercent}
                   className="w-full accent-emerald-500 bg-slate-100 h-1 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -341,6 +353,10 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
                   step="50"
                   value={electricityKwhPerMonth}
                   onChange={(e) => setElectricityKwhPerMonth(Number(e.target.value))}
+                  aria-label="Monthly electricity usage in kilowatt hours"
+                  aria-valuemin={50}
+                  aria-valuemax={1500}
+                  aria-valuenow={electricityKwhPerMonth}
                   className="w-full accent-emerald-500 bg-slate-100 h-1 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -358,6 +374,10 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
                   step="10"
                   value={greenEnergyPercent}
                   onChange={(e) => setGreenEnergyPercent(Number(e.target.value))}
+                  aria-label="Renewable energy percentage of electricity supply"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={greenEnergyPercent}
                   className="w-full accent-emerald-500 bg-slate-100 h-1 rounded-lg appearance-none cursor-pointer"
                 />
               </div>
@@ -377,10 +397,11 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
                       key={heat.id}
                       type="button"
                       onClick={() => setHeatingType(heat.id as any)}
+                      aria-label={`Select heating source: ${heat.label}`}
                       className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
                         heatingType === heat.id 
-                          ? 'bg-emerald-55/50 border-emerald-400 text-slate-900 font-semibold' 
-                          : 'bg-white border-slate-100 text-slate-50 hover:border-slate-200'
+                          ? 'bg-emerald-50 border-emerald-400 text-slate-900 font-semibold' 
+                          : 'bg-white border-slate-100 text-slate-500 hover:border-slate-200'
                       }`}
                     >
                       <p>{heat.label}</p>
@@ -547,7 +568,8 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
           type="button"
           onClick={handleBack}
           disabled={step === 'transport' || isLoading}
-          className="flex items-center justify-center gap-1 h-9 px-3 text-xs font-semibold rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 disabled:opacity-30 transition-all cursor-pointer"
+          aria-label="Previous onboarding questionnaire step"
+          className="flex items-center justify-center gap-1 h-9 px-3 text-xs font-semibold rounded-xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 disabled:opacity-30 transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
         >
           <ChevronLeft className="w-4 h-4" />
           <span>Back</span>
@@ -558,7 +580,8 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
             type="button"
             onClick={handleSubmit}
             disabled={isLoading}
-            className="flex items-center justify-center gap-1.5 h-10 px-5 text-xs font-bold rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-all cursor-pointer disabled:opacity-50"
+            aria-label="Confirm baseline questionnaire and build personalized coaching strategy"
+            className="flex items-center justify-center gap-1.5 h-10 px-5 text-xs font-bold rounded-xl bg-emerald-500 text-white hover:bg-emerald-600 transition-all cursor-pointer disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500"
           >
             {isLoading ? (
               <>
@@ -576,7 +599,8 @@ export function OnboardingQuestionnaire({ initialData, onSave, isLoading }: Onbo
           <button
             type="button"
             onClick={handleNext}
-            className="flex items-center justify-center gap-1 h-10 px-4 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all cursor-pointer"
+            aria-label="Next onboarding questionnaire step"
+            className="flex items-center justify-center gap-1 h-10 px-4 text-xs font-bold rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 transition-all cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
           >
             <span>Next</span>
             <ChevronRight className="w-4 h-4" />

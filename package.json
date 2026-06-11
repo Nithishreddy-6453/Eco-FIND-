@@ -9,7 +9,7 @@
     "start": "node dist/server.cjs",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx src/tests/carbonEngine.test.ts && tsx src/tests/engagement.test.ts"
+    "test": "tsx src/tests/carbonEngine.test.ts && tsx src/tests/engagement.test.ts && tsx src/tests/integration.test.ts"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

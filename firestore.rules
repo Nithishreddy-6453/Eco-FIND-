@@ -28,13 +28,13 @@ service cloud.firestore {
         && data.createdAt == request.time
         && data.streakCount is int 
         && data.streakCount >= 0
-        && data.totalCo2SavedKg is number
+        && (data.totalCo2SavedKg is int || data.totalCo2SavedKg is float)
         && data.totalCo2SavedKg >= 0
         && data.xp is int && data.xp >= 0
         && data.levelName is string && data.levelName in ['Eco Beginner', 'Green Explorer', 'Climate Warrior', 'Eco Hero', 'Planet Guardian']
         && data.badges is list
-        && data.weeklyGoalCo2 is number && data.weeklyGoalCo2 >= 0
-        && data.weeklyProgressCo2 is number && data.weeklyProgressCo2 >= 0
+        && (data.weeklyGoalCo2 is int || data.weeklyGoalCo2 is float) && data.weeklyGoalCo2 >= 0
+        && (data.weeklyProgressCo2 is int || data.weeklyProgressCo2 is float) && data.weeklyProgressCo2 >= 0
         && data.completedChallengeIds is list
         && (data.email == null || (data.email is string && data.email.size() <= 200))
         && (data.displayName == null || (data.displayName is string && data.displayName.size() <= 150))
@@ -53,15 +53,15 @@ service cloud.firestore {
         && data.uid == request.auth.uid
         && data.updatedAt == request.time
         && data.commuteMode in ['car', 'public_transport', 'bike_walk', 'electric_car', 'hybrid_car']
-        && data.distancePerDayKm is number && data.distancePerDayKm >= 0 && data.distancePerDayKm <= 500
+        && (data.distancePerDayKm is int || data.distancePerDayKm is float) && data.distancePerDayKm >= 0 && data.distancePerDayKm <= 500
         && data.annualFlights is int && data.annualFlights >= 0 && data.annualFlights <= 1000
         && data.dietType in ['heavy_meat', 'occasional_meat', 'vegetarian', 'vegan']
-        && data.localFoodPercent is number && data.localFoodPercent >= 0 && data.localFoodPercent <= 100
+        && (data.localFoodPercent is int || data.localFoodPercent is float) && data.localFoodPercent >= 0 && data.localFoodPercent <= 100
         && data.foodWasteLevel in ['high', 'medium', 'low']
-        && data.electricityKwhPerMonth is number && data.electricityKwhPerMonth >= 0 && data.electricityKwhPerMonth <= 50000
-        && data.greenEnergyPercent is number && data.greenEnergyPercent >= 0 && data.greenEnergyPercent <= 100
+        && (data.electricityKwhPerMonth is int || data.electricityKwhPerMonth is float) && data.electricityKwhPerMonth >= 0 && data.electricityKwhPerMonth <= 50000
+        && (data.greenEnergyPercent is int || data.greenEnergyPercent is float) && data.greenEnergyPercent >= 0 && data.greenEnergyPercent <= 100
         && data.heatingType in ['gas', 'electric', 'coal_oil', 'district_solar', 'none']
-        && (data.thermostatOffsetC == null || (data.thermostatOffsetC is number && data.thermostatOffsetC >= -10 && data.thermostatOffsetC <= 10))
+        && (data.thermostatOffsetC == null || ((data.thermostatOffsetC is int || data.thermostatOffsetC is float) && data.thermostatOffsetC >= -10 && data.thermostatOffsetC <= 10))
         && data.shoppingHabits in ['high_consumer', 'moderate', 'minimalist']
         && data.recyclingLevel in ['none', 'some', 'full'];
     }
@@ -78,7 +78,7 @@ service cloud.firestore {
         && data.title is string && data.title.size() <= 200
         && data.description is string && data.description.size() <= 1000
         && data.category in ['Transport', 'Diet', 'Energy', 'Consumption']
-        && data.co2SavedKgPerYear is number && data.co2SavedKgPerYear >= 0
+        && (data.co2SavedKgPerYear is int || data.co2SavedKgPerYear is float) && data.co2SavedKgPerYear >= 0
         && data.difficulty in ['easy', 'medium', 'hard']
         && data.personalizedReasoning is string && data.personalizedReasoning.size() <= 3000
         && data.actionItems is list && data.actionItems.size() <= 20
@@ -96,7 +96,7 @@ service cloud.firestore {
         && data.recommendationId is string && data.recommendationId.size() <= 128
         && data.recommendationTitle is string && data.recommendationTitle.size() <= 200
         && data.category in ['Transport', 'Diet', 'Energy', 'Consumption']
-        && data.co2SavedKg is number && data.co2SavedKg >= 0
+        && (data.co2SavedKg is int || data.co2SavedKg is float) && data.co2SavedKg >= 0
         && data.loggedAt == request.time;
     }
 

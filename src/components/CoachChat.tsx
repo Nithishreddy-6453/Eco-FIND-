@@ -150,6 +150,8 @@ export function CoachChat({ chatMessages, isChatLoading, onSendMessage }: CoachC
         <form onSubmit={handleSubmit} className="flex gap-2 relative">
           <input
             type="text"
+            id="coach-chat-input"
+            aria-label="Type your message to the Sustainability Coach"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isChatLoading}
