@@ -1,0 +1,80 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "EcoMind AI Decision API",
+    "description": "Standardized REST endpoints for computing carbon statistics and proxying Gemini coaching instructions.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "/api"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Check API status",
+        "responses": {
+          "200": {
+            "description": "System operational metrics and dependencies status."
+          }
+        }
+      }
+    },
+    "/coach/generate": {
+      "post": {
+        "summary": "Process deterministic calculations and prioritize recommendations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["lifestyle"],
+                "properties": {
+                  "lifestyle": {
+                    "type": "object",
+                    "description": "User's transportation, dietary, home utility, and goods consumption choices."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Optimized tradeoffs, sorted recommendations list, and mathematical insights."
+          }
+        }
+      }
+    },
+    "/coach/chat": {
+      "post": {
+        "summary": "Interact with Gemini Science Coach incorporating real baseline parameters",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["message"],
+                "properties": {
+                  "message": { "type": "string" },
+                  "lifestyle": { "type": "object" },
+                  "userProfile": { "type": "object" },
+                  "recommendations": { "type": "array" },
+                  "impactLogs": { "type": "array" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Personalized context-aware explanation output."
+          }
+        }
+      }
+    }
+  }
+}

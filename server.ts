@@ -4,6 +4,10 @@ import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI, Type } from '@google/genai';
 import { CarbonIntelligenceEngine } from './src/services/carbonEngine';
+import { securityHeaders } from './src/middleware/securityHeaders';
+import { rateLimiter } from './src/middleware/rateLimiter';
+import { logger } from './src/utils/logger';
+import { LifestyleSchema } from './src/utils/schemas';
 
 dotenv.config();
 
@@ -29,8 +33,13 @@ if (GEMINI_API_KEY && GEMINI_API_KEY !== 'MY_GEMINI_API_KEY') {
 const app = express();
 app.use(express.json());
 
+// Enforce standard middleware layers for all requests
+app.use(securityHeaders);
+app.use(rateLimiter);
+
 // API: Health probe
 app.get('/api/health', (req, res) => {
+  logger.info('Received health probe request');
   res.json({ status: 'ok', firebaseBootstrapped: !!process.env.APP_URL });
 });
 
@@ -39,11 +48,17 @@ app.post('/api/coach/generate', async (req, res) => {
   try {
     const { lifestyle } = req.body;
     if (!lifestyle) {
+      logger.warn('Generate request missing lifestyle data');
       return res.status(400).json({ success: false, error: 'Lifestyle data is required' });
     }
 
+    // Enterprise-grade sanitization schema validation
+    const validatedLifestyle = LifestyleSchema.validate(lifestyle);
+
     // Process the lifestyle data deterministically using our robust math model
-    const engineResult = CarbonIntelligenceEngine.process(lifestyle);
+    const engineResult = CarbonIntelligenceEngine.process(validatedLifestyle);
+
+    logger.info('Processed Carbon Calculation', { uid: validatedLifestyle.uid });
 
     res.json({
       success: true,
@@ -52,7 +67,7 @@ app.post('/api/coach/generate', async (req, res) => {
       breakdown: engineResult.breakdown
     });
   } catch (error) {
-    console.error('EcoMind Carbon Intelligence Engine Failed:', error);
+    logger.error('EcoMind Carbon Intelligence Engine Failed', error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown backend logic error',
@@ -66,18 +81,23 @@ app.post('/api/coach/chat', async (req, res) => {
     const { message, history, lifestyle, userProfile, recommendations, impactLogs } = req.body;
     
     if (!message) {
+      logger.warn('Chat request missing message');
       return res.status(400).json({ success: false, error: 'User message is required.' });
     }
 
     if (!ai) {
+      logger.warn('Chat request received but Gemini API is unconfigured');
       return res.status(503).json({
         success: false,
         error: 'Gemini API is not configured on the server. Please attach a secret key in the applet settings.',
       });
     }
 
+    // Run inputs through validation schema if present
+    const validatedLifestyle = lifestyle ? LifestyleSchema.validate(lifestyle) : null;
+
     // 1. Calculate and collect the required variables
-    const footprint = lifestyle ? CarbonIntelligenceEngine.calculateEmissions(lifestyle) : null;
+    const footprint = validatedLifestyle ? CarbonIntelligenceEngine.calculateEmissions(validatedLifestyle) : null;
     const highestSource = footprint ? CarbonIntelligenceEngine.getHighestCategory(footprint) : null;
     const topRec = recommendations && recommendations.filter((r: any) => r.status === 'active')[0];
     
@@ -151,7 +171,7 @@ Role & Guidelines:
     });
 
   } catch (error) {
-    console.error('Sustainability Coach chat failed:', error);
+    logger.error('Sustainability Coach chat failed', error);
     res.status(500).json({
       success: false,
       error: error instanceof Error ? error.message : 'Visual coaching server error. Please try again.',
@@ -177,10 +197,10 @@ async function setupServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`EcoMind AI full-stack server active at http://0.0.0.0:${PORT}`);
+    logger.info(`EcoMind AI full-stack server active at http://0.0.0.0:${PORT}`);
   });
 }
 
 setupServer().catch((err) => {
-  console.error('Critical server starting failure:', err);
+  logger.error('Critical server starting failure', err);
 });

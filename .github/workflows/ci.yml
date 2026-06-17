@@ -1,0 +1,40 @@
+name: EcoMind AI Continuous Integration
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  audit-and-test:
+    name: Lint, Compile, and Execute Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v4
+
+      - name: Initialize Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Quality Audit (ESLint / TSC Compilation)
+        run: npm run lint
+
+      - name: Execute Vitest Suite
+        run: npx vitest run
+
+      - name: Execute Carbon Intelligence Mathematical Tests
+        run: npx tsx src/tests/carbonEngine.test.ts
+
+      - name: Execute End-to-End Core Integration Tests
+        run: npx tsx src/tests/integration.test.ts
+
+      - name: Verify Multi-Stage Bundle Phase
+        run: npm run build
