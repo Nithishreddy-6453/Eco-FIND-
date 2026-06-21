@@ -11,7 +11,7 @@
 > 
 > *An Elite, Professional, Decoupled 4-Engine Carbon Intelligence Platform.*
 > 
-> *   **🚀 Live Preview (Production)**: [EcoMind AI Live App](https://ais-pre-eltfqivrpd5xb7r3e7hlc4-734301719527.asia-southeast1.run.app)
+> *   **🚀 Live Preview (Production)**: https://ecomind-ai-451651369941.asia-southeast1.run.app
 > *   **🧪 Live Preview (Dev Studio)**: [EcoMind AI Development Sandbox](https://ais-dev-eltfqivrpd5xb7r3e7hlc4-734301719527.asia-southeast1.run.app)
 
 ---
