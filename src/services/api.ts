@@ -18,13 +18,17 @@ export const EcoMindAPI = {
   /**
    * Request recommendations containing highly specific lifestyle tradeoffs
    */
-  async generatePersonalizedCoachRecommendations(lifestyle: LifestyleData): Promise<CoachResponse> {
+  async generatePersonalizedCoachRecommendations(
+    lifestyle: LifestyleData,
+    userProfile: UserProfile | null = null,
+    impactLogs: ImpactLog[] = []
+  ): Promise<CoachResponse> {
     const response = await fetch('/api/coach/generate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ lifestyle }),
+      body: JSON.stringify({ lifestyle, userProfile, impactLogs }),
     });
 
     if (!response.ok) {

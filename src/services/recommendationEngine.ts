@@ -9,7 +9,8 @@ export const RecommendationEngine = {
    * de-prioritized compared to the peak option, expected impact, and comparative metrics.
    */
   generateRecommendations(context: UnifiedContext): Recommendation[] {
-    const { lifestyle, carbonScore } = context;
+    const { lifestyle, carbonScore, progress } = context;
+    const completedIds = new Set(progress?.historyLogs?.map(log => log.recommendationId).filter(Boolean) || []);
     const rawRecommendations: Omit<Recommendation, 'whySelected' | 'whyRejected' | 'estimatedImpact' | 'status' | 'createdAt' | 'updatedAt' | 'uid' | 'personalizedReasoning'>[] = [];
 
     // --- 1. Commute Mode Recommendation ---
@@ -240,13 +241,16 @@ export const RecommendationEngine = {
       }
     }
 
-    // Sort immediately descending by raw potential CO2 reduction
-    rawRecommendations.sort((a, b) => b.co2SavedKgPerYear - a.co2SavedKgPerYear);
+    // Filter out recommendations that have been completed
+    const activeRawRecommendations = rawRecommendations.filter(rec => !completedIds.has(rec.id));
 
-    const topAction = rawRecommendations[0];
+    // Sort immediately descending by raw potential CO2 reduction
+    activeRawRecommendations.sort((a, b) => b.co2SavedKgPerYear - a.co2SavedKgPerYear);
+
+    const topAction = activeRawRecommendations[0];
 
     // Enrichment mapping (Adding Explainability and Rationale logs)
-    const processedRecommendations = rawRecommendations.map((rawRec, index): Recommendation => {
+    const processedRecommendations = activeRawRecommendations.map((rawRec, index): Recommendation => {
       const isTop = index === 0;
       const monthlySaved = Math.round(rawRec.co2SavedKgPerYear / 12);
       const estimatedImpact = `Saves ${rawRec.co2SavedKgPerYear.toLocaleString()} kg CO₂/year (approx. ${monthlySaved} kg/month)`;

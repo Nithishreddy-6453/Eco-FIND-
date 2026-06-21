@@ -101,6 +101,7 @@ export interface UnifiedContext {
     totalCo2SavedKg: number;
     completedCount: number;
     historyLogs: Array<{
+      recommendationId?: string;
       recommendationTitle: string;
       co2SavedKg: number;
       loggedAt: string;

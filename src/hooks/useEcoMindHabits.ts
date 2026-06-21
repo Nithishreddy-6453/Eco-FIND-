@@ -35,7 +35,7 @@ export function useEcoMindHabits({
     setError(null);
 
     try {
-      const coachData = await EcoMindAPI.generatePersonalizedCoachRecommendations(lifestyle);
+      const coachData = await EcoMindAPI.generatePersonalizedCoachRecommendations(lifestyle, userProfile, impactLogs);
       if (coachData.success && coachData.recommendations.length > 0) {
         const generatedRecs: Recommendation[] = coachData.recommendations.map((rec, idx) => ({
           ...rec,
@@ -83,7 +83,7 @@ export function useEcoMindHabits({
     } finally {
       setIsGenerating(false);
     }
-  }, [currentUser, isGuestMode, recommendations, setRecommendations, setError, setIsGenerating]);
+  }, [currentUser, isGuestMode, recommendations, setRecommendations, setError, setIsGenerating, userProfile, impactLogs]);
 
   const saveLifestyleHabits = useCallback(async (input: Omit<LifestyleData, 'uid' | 'updatedAt'>) => {
     if (!currentUser) return;

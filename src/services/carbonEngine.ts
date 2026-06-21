@@ -1,4 +1,4 @@
-import { LifestyleData } from '../types';
+import { LifestyleData, UserProfile, ImpactLog } from '../types';
 import { EMISSION_FACTORS } from '../constants';
 import { ContextEngine } from './contextEngine';
 import { RecommendationEngine } from './recommendationEngine';
@@ -122,7 +122,11 @@ export const CarbonIntelligenceEngine = {
   /**
    * 3. Rank actions by impact. Delegates to RecommendationEngine.
    */
-  rankActions(rawLifestyle: Omit<LifestyleData, 'uid' | 'updatedAt'>): RankedAction[] {
+  rankActions(
+    rawLifestyle: Omit<LifestyleData, 'uid' | 'updatedAt'>,
+    userProfile: UserProfile | null = null,
+    impactLogs: ImpactLog[] = []
+  ): RankedAction[] {
     const lifestyleWithDefaults: LifestyleData = {
       ...rawLifestyle,
       uid: 'temp_user',
@@ -130,7 +134,7 @@ export const CarbonIntelligenceEngine = {
     } as LifestyleData;
 
     // Build context
-    const context = ContextEngine.buildContext(null, lifestyleWithDefaults, []);
+    const context = ContextEngine.buildContext(userProfile, lifestyleWithDefaults, impactLogs);
     
     // Delegate to Recommendation Engine
     const generated = RecommendationEngine.generateRecommendations(context);
@@ -155,15 +159,19 @@ export const CarbonIntelligenceEngine = {
   /**
    * 4. Compile everything and produce structured, mathematically sound insights.
    */
-  process(lifestyle: Omit<LifestyleData, 'uid' | 'updatedAt'>): EngineResult {
+  process(
+    lifestyle: Omit<LifestyleData, 'uid' | 'updatedAt'>,
+    userProfile: UserProfile | null = null,
+    impactLogs: ImpactLog[] = []
+  ): EngineResult {
     const rawLifestyle: LifestyleData = {
       ...lifestyle,
       uid: 'temp_user',
       updatedAt: new Date().toISOString()
     } as LifestyleData;
 
-    const context = ContextEngine.buildContext(null, rawLifestyle, []);
-    const rankedActions = this.rankActions(lifestyle);
+    const context = ContextEngine.buildContext(userProfile, rawLifestyle, impactLogs);
+    const rankedActions = this.rankActions(lifestyle, userProfile, impactLogs);
     const decision = DecisionEngine.makeDecision(context);
 
     // Map largest emission category to the insight biggestSource
@@ -177,7 +185,7 @@ export const CarbonIntelligenceEngine = {
         biggestSource: highestCatObj.category,
         contribution: decision.contributionPercentage,
         highestImpactAction: decision.highestImpactAction,
-        estimatedReduction: `${Math.round(rankedActions[0]?.co2SavedKgPerYear / 12 || 10)}kg CO2/month`
+        estimatedReduction: `${Math.round((rankedActions[0]?.co2SavedKgPerYear || 120) / 12)}kg CO2/month`
       }
     };
   }

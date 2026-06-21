@@ -42,6 +42,7 @@ export const ContextEngine = {
 
     // 3. Build progress parameters
     const historyLogs = impactLogs.map(log => ({
+      recommendationId: log.recommendationId,
       recommendationTitle: log.recommendationTitle,
       co2SavedKg: log.co2SavedKg,
       loggedAt: log.loggedAt,

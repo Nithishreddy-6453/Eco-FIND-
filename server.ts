@@ -46,7 +46,7 @@ app.get('/api/health', (req, res) => {
 // API: AI Decision Coach endpoint using Deterministic Carbon Intelligence Engine
 app.post('/api/coach/generate', async (req, res) => {
   try {
-    const { lifestyle } = req.body;
+    const { lifestyle, userProfile, impactLogs } = req.body;
     if (!lifestyle) {
       logger.warn('Generate request missing lifestyle data');
       return res.status(400).json({ success: false, error: 'Lifestyle data is required' });
@@ -56,7 +56,7 @@ app.post('/api/coach/generate', async (req, res) => {
     const validatedLifestyle = LifestyleSchema.validate(lifestyle);
 
     // Process the lifestyle data deterministically using our robust math model
-    const engineResult = CarbonIntelligenceEngine.process(validatedLifestyle);
+    const engineResult = CarbonIntelligenceEngine.process(validatedLifestyle, userProfile || null, impactLogs || []);
 
     logger.info('Processed Carbon Calculation', { uid: validatedLifestyle.uid });
 
